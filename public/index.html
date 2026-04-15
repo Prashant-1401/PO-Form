@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purchase Order Form</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: hsl(220 20% 97%); color: hsl(220 25% 10%); -webkit-font-smoothing: antialiased; }
+  .page { min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 940px; margin: 0 auto; }
+  .header { display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+  .header p { font-size: 0.875rem; color: hsl(220 10% 46%); margin-top: 0.25rem; }
+  .header-actions { display: flex; gap: 0.5rem; }
+  .header-btn { padding: 0.5rem 0.75rem; font-size: 0.8125rem; border: 1px solid hsl(220 13% 89%); border-radius: calc(0.625rem - 2px); background: #fff; color: hsl(220 25% 10%); cursor: pointer; font-family: 'DM Sans', system-ui, sans-serif; transition: all 0.15s; }
+  .header-btn:hover { background: hsl(220 16% 93%); }
+  .section { background: #fff; border: 1px solid hsl(220 13% 89%); border-radius: 0.625rem; padding: 1.25rem 1.5rem; margin-top: 1.25rem; box-shadow: 0 1px 2px 0 hsl(220 25% 10% / 0.04); animation: fadeIn 0.4s ease-out both; }
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.1s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .section-title { font-size: 0.6875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: hsl(220 10% 46%); margin-bottom: 1rem; }
+  .field-grid { display: grid; gap: 1rem; }
+  .field-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  label { display: block; font-size: 0.875rem; color: hsl(220 10% 46%); margin-bottom: 0.375rem; }
+  input, select, textarea { width: 100%; border: 1px solid hsl(220 13% 89%); border-radius: calc(0.625rem - 2px); padding: 0.5rem 0.75rem; font-size: 0.875rem; font-family: 'DM Sans', system-ui, sans-serif; background: #fff; color: hsl(220 25% 10%); outline: none; transition: box-shadow 0.15s, border-color 0.15s; }
+  input::placeholder, textarea::placeholder { color: hsl(220 10% 46% / 0.4); }
+  input:focus, select:focus, textarea:focus { border-color: hsl(230 65% 52%); box-shadow: 0 0 0 3px hsl(230 65% 52% / 0.12); }
+  .items-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  .items-table thead th { text-align: left; font-size: 0.75rem; font-weight: 500; color: hsl(220 10% 46%); padding: 0.5rem; border-bottom: 1px solid hsl(220 13% 89%); }
+  .items-table tbody td { padding: 0.375rem 0.25rem; vertical-align: middle; }
+  .items-table tbody tr { border-bottom: 1px solid hsl(220 13% 89% / 0.5); }
+  .items-table tbody tr:last-child { border-bottom: none; }
+  .items-table td input { padding: 0.375rem 0.625rem; font-size: 0.8125rem; }
+  .col-sn { width: 36px; font-size: 0.75rem; color: hsl(220 10% 46%); }
+  .col-item { min-width: 160px; }
+  .col-qty { width: 90px; }
+  .col-rate { width: 100px; }
+  .col-amt { width: 110px; }
+  .col-rem { min-width: 120px; }
+  .col-del { width: 36px; }
+  .amount-cell { font-size: 0.8125rem; font-weight: 500; background: hsl(220 14% 95%); border-radius: calc(0.625rem - 2px); padding: 0.375rem 0.625rem; text-align: right; }
+  .total-amount { background: hsl(230 65% 52% / 0.05); color: hsl(230 65% 52%); font-weight: 600; }
+  .items-table tfoot td { font-size: 0.75rem; color: hsl(220 10% 46%); padding-top: 0.75rem; border-top: 1px solid hsl(220 13% 89%); }
+  .items-table tfoot .fw { font-weight: 500; color: hsl(220 25% 10%); }
+  .add-row-btn { display: inline-flex; align-items: center; gap: 0.375rem; margin-top: 0.75rem; padding: 0.5rem 0.875rem; font-size: 0.875rem; border: 1px solid hsl(220 13% 89%); border-radius: calc(0.625rem - 2px); background: hsl(220 16% 93%); color: hsl(220 25% 15%); cursor: pointer; font-family: 'DM Sans', system-ui, sans-serif; transition: background 0.15s; }
+  .add-row-btn:hover { background: hsl(220 16% 90%); }
+  .del-btn { display: flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; border: none; background: none; color: hsl(220 10% 46% / 0.4); cursor: pointer; border-radius: calc(0.625rem - 2px); font-size: 1rem; transition: background 0.15s, color 0.15s; }
+  .del-btn:hover { background: hsl(0 72% 51% / 0.1); color: hsl(0 72% 51%); }
+  .summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .metric-card { background: hsl(220 14% 95%); border-radius: 0.5rem; padding: 0.75rem 1rem; }
+  .metric-card.highlight { background: hsl(230 65% 52% / 0.05); border: 1px solid hsl(230 65% 52% / 0.1); }
+  .metric-label { font-size: 0.75rem; color: hsl(220 10% 46%); margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.375rem; }
+  .metric-card.highlight .metric-label { color: hsl(230 65% 52% / 0.7); }
+  .metric-value { font-size: 1.25rem; font-weight: 600; }
+  .metric-card.highlight .metric-value { color: hsl(230 65% 52%); }
+  .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; justify-content: flex-end; animation: fadeIn 0.4s ease-out 0.2s both; }
+  .btn-primary { padding: 0.625rem 1.5rem; background: hsl(230 65% 52%); color: #fff; border: none; border-radius: calc(0.625rem - 2px); font-size: 0.875rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', system-ui, sans-serif; box-shadow: 0 1px 2px 0 hsl(220 25% 10% / 0.04); transition: opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary { padding: 0.625rem 1.25rem; background: hsl(220 16% 93%); color: hsl(220 25% 15%); border: 1px solid hsl(220 13% 89%); border-radius: calc(0.625rem - 2px); font-size: 0.875rem; cursor: pointer; font-family: 'DM Sans', system-ui, sans-serif; transition: background 0.15s; }
+  .btn-secondary:hover { background: hsl(220 16% 90%); }
+  .toast { display: none; position: fixed; bottom: 20px; right: 20px; background: hsl(220 25% 10%); color: #fff; padding: 0.625rem 1.125rem; border-radius: calc(0.625rem - 2px); font-size: 0.8125rem; z-index: 999; box-shadow: 0 12px 32px -4px hsl(220 25% 10% / 0.15); }
+  .toast.success { background: hsl(150 60% 40%); }
+  .toast.error { background: hsl(0 72% 51%); }
+  .po-list { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #fff; z-index: 1000; overflow-y: auto; }
+  .po-list.active { display: block; }
+  .po-list-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid hsl(220 13% 89%); background: #fff; position: sticky; top: 0; }
+  .po-list-content { padding: 1rem 1.5rem; }
+  .po-card { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid hsl(220 13% 89%); border-radius: 0.5rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.15s; }
+  .po-card:hover { border-color: hsl(230 65% 52%); box-shadow: 0 2px 8px hsl(220 25% 10% / 0.08); }
+  .po-card-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .po-card-info p { font-size: 0.8125rem; color: hsl(220 10% 46%); }
+  .po-card-meta { text-align: right; }
+  .po-card-meta .amount { font-size: 1.125rem; font-weight: 600; color: hsl(230 65% 52%); }
+  .po-card-meta .date { font-size: 0.75rem; color: hsl(220 10% 46%); }
+  .empty-state { text-align: center; padding: 3rem; color: hsl(220 10% 46%); }
+  .loading { display: none; text-align: center; padding: 2rem; color: hsl(220 10% 46%); }
+  .loading.active { display: block; }
+  @media (max-width: 640px) {
+    .field-grid-3 { grid-template-columns: 1fr; }
+    .summary-bar { grid-template-columns: 1fr; }
+    .header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>Purchase Order</h1>
+        <p>Enter PO details and line items</p>
+      </div>
+      <div class="header-actions">
+        <button class="header-btn" id="view-list-btn">View All POs</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">PO Details</div>
+      <div class="field-grid field-grid-3">
+        <div><label for="po-date">Date</label><input type="date" id="po-date" /></div>
+        <div><label for="po-number">PO Number</label><input type="text" id="po-number" placeholder="e.g. PO-2026-001" /></div>
+        <div><label for="customer-name">Customer Name</label><input type="text" id="customer-name" placeholder="Customer / supplier name" /></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Line Items</div>
+      <div style="overflow-x:auto;">
+        <table class="items-table">
+          <thead><tr>
+            <th class="col-sn">#</th><th class="col-item">Item Name</th><th class="col-qty">Qty</th>
+            <th class="col-rate">Rate (₹)</th><th class="col-amt">Amount (₹)</th><th class="col-rem">Remark</th><th class="col-del"></th>
+          </tr></thead>
+          <tbody id="items-body"></tbody>
+          <tfoot><tr>
+            <td colspan="3" style="padding:10px 8px 4px;">Total items: <span class="fw" id="total-items">0</span></td>
+            <td style="padding:10px 8px 4px;">Total qty: <span class="fw" id="total-qty">0</span></td>
+            <td style="padding:10px 4px 4px;"><div class="amount-cell total-amount">₹<span id="grand-total">0.00</span></div></td>
+            <td colspan="2"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <button class="add-row-btn" id="add-row-btn">+ Add line item</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Summary</div>
+      <div class="summary-bar">
+        <div class="metric-card"><div class="metric-label">Line Items</div><div class="metric-value" id="s-items">0</div></div>
+        <div class="metric-card"><div class="metric-label">Total Quantity</div><div class="metric-value" id="s-qty">0</div></div>
+        <div class="metric-card highlight"><div class="metric-label">Order Value</div><div class="metric-value" id="s-total">₹0.00</div></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="clear-btn">Clear form</button>
+      <button class="btn-primary" id="submit-btn">Submit order</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="po-list" id="po-list">
+  <div class="po-list-header">
+    <h2>All Purchase Orders</h2>
+    <button class="header-btn" id="close-list-btn">Close</button>
+  </div>
+  <div class="po-list-content" id="po-list-content">
+    <div class="loading active" id="list-loading">Loading...</div>
+    <div class="empty-state" id="empty-state" style="display:none;">No purchase orders yet</div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '';
+let rowCount = 0;
+let currentPOId = null;
+
+function addRow() {
+  rowCount++;
+  const t = document.getElementById('items-body');
+  const r = document.createElement('tr');
+  r.dataset.row = rowCount;
+  r.innerHTML = '<td class="col-sn" style="padding:6px 8px;font-size:0.75rem;color:hsl(220 10% 46%)">' + rowCount + '</td>' +
+    '<td><input type="text" placeholder="Item description" class="item-name"/></td>' +
+    '<td><input type="number" placeholder="0" min="0" class="item-qty"/></td>' +
+    '<td><input type="number" placeholder="0.00" min="0" step="0.01" class="item-rate"/></td>' +
+    '<td><div class="amount-cell">₹<span class="item-amount">0.00</span></div></td>' +
+    '<td><input type="text" placeholder="Optional" class="item-remark"/></td>' +
+    '<td><button class="del-btn" title="Remove">×</button></td>';
+  t.appendChild(r);
+  r.querySelector('.item-qty').addEventListener('input', () => recalcRow(r));
+  r.querySelector('.item-rate').addEventListener('input', () => recalcRow(r));
+  r.querySelector('.del-btn').addEventListener('click', () => { r.remove(); reindex(); recalcTotals() });
+}
+
+function recalcRow(r) {
+  const q = parseFloat(r.querySelector('.item-qty').value) || 0;
+  const rt = parseFloat(r.querySelector('.item-rate').value) || 0;
+  r.querySelector('.item-amount').textContent = (q * rt).toFixed(2);
+  recalcTotals();
+}
+
+function recalcTotals() {
+  const rows = document.querySelectorAll('#items-body tr');
+  let tq = 0, gt = 0;
+  rows.forEach(r => {
+    tq += parseFloat(r.querySelector('.item-qty').value) || 0;
+    gt += parseFloat(r.querySelector('.item-amount').textContent) || 0;
+  });
+  const c = rows.length;
+  document.getElementById('total-items').textContent = c;
+  document.getElementById('total-qty').textContent = tq;
+  document.getElementById('grand-total').textContent = gt.toFixed(2);
+  document.getElementById('s-items').textContent = c;
+  document.getElementById('s-qty').textContent = tq;
+  document.getElementById('s-total').textContent = '₹' + gt.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function reindex() {
+  document.querySelectorAll('#items-body tr').forEach((r, i) => { r.cells[0].textContent = i + 1; });
+  rowCount = document.querySelectorAll('#items-body tr').length;
+}
+
+function showToast(m, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = m;
+  t.className = 'toast ' + type;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+function getFormData() {
+  const items = [];
+  document.querySelectorAll('#items-body tr').forEach(r => {
+    const name = r.querySelector('.item-name').value.trim();
+    const q = parseFloat(r.querySelector('.item-qty').value) || 0;
+    const rt = parseFloat(r.querySelector('.item-rate').value) || 0;
+    const amt = parseFloat(r.querySelector('.item-amount').textContent) || 0;
+    const remark = r.querySelector('.item-remark').value.trim();
+    if (name || q || rt) {
+      items.push({ item_name: name, quantity: q, rate: rt, amount: amt, remark: remark });
+    }
+  });
+  return {
+    po_date: document.getElementById('po-date').value,
+    po_number: document.getElementById('po-number').value.trim(),
+    customer_name: document.getElementById('customer-name').value.trim(),
+    items: items
+  };
+}
+
+function loadPO(po) {
+  currentPOId = po.id;
+  document.getElementById('po-date').value = po.po_date;
+  document.getElementById('po-number').value = po.po_number;
+  document.getElementById('customer-name').value = po.customer_name;
+  
+  const t = document.getElementById('items-body');
+  t.innerHTML = '';
+  rowCount = 0;
+  
+  po.items.forEach(item => {
+    rowCount++;
+    const r = document.createElement('tr');
+    r.dataset.row = rowCount;
+    r.innerHTML = '<td class="col-sn" style="padding:6px 8px;font-size:0.75rem;color:hsl(220 10% 46%)">' + rowCount + '</td>' +
+      '<td><input type="text" placeholder="Item description" class="item-name" value="' + item.item_name + '"/></td>' +
+      '<td><input type="number" placeholder="0" min="0" class="item-qty" value="' + item.quantity + '"/></td>' +
+      '<td><input type="number" placeholder="0.00" min="0" step="0.01" class="item-rate" value="' + item.rate + '"/></td>' +
+      '<td><div class="amount-cell">₹<span class="item-amount">' + item.amount.toFixed(2) + '</span></div></td>' +
+      '<td><input type="text" placeholder="Optional" class="item-remark" value="' + (item.remark || '') + '"/></td>' +
+      '<td><button class="del-btn" title="Remove">×</button></td>';
+    t.appendChild(r);
+    r.querySelector('.item-qty').addEventListener('input', () => recalcRow(r));
+    r.querySelector('.item-rate').addEventListener('input', () => recalcRow(r));
+    r.querySelector('.del-btn').addEventListener('click', () => { r.remove(); reindex(); recalcTotals() });
+  });
+  
+  recalcTotals();
+  showToast('PO loaded: ' + po.po_number);
+}
+
+function clearForm() {
+  document.getElementById('po-date').value = '';
+  document.getElementById('po-number').value = '';
+  document.getElementById('customer-name').value = '';
+  document.getElementById('items-body').innerHTML = '';
+  rowCount = 0;
+  currentPOId = null;
+  recalcTotals();
+  addRow();
+  addRow();
+}
+
+async function submitPO() {
+  const data = getFormData();
+  
+  if (!data.po_date || !data.po_number || !data.customer_name) {
+    showToast('Please fill in PO date, number and customer name.', 'error');
+    return;
+  }
+  
+  if (data.items.length === 0) {
+    showToast('Add at least one line item.', 'error');
+    return;
+  }
+  
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  
+  try {
+    const response = await fetch(API_BASE + '/api/pos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      showToast('Order submitted successfully!', 'success');
+      clearForm();
+    } else {
+      showToast(result.error || 'Failed to submit order', 'error');
+    }
+  } catch (error) {
+    showToast('Error: ' + error.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit order';
+  }
+}
+
+async function loadPOList() {
+  const listEl = document.getElementById('po-list');
+  const contentEl = document.getElementById('po-list-content');
+  const loadingEl = document.getElementById('list-loading');
+  const emptyEl = document.getElementById('empty-state');
+  
+  listEl.classList.add('active');
+  loadingEl.classList.add('active');
+  emptyEl.style.display = 'none';
+  contentEl.innerHTML = '';
+  contentEl.appendChild(loadingEl);
+  contentEl.appendChild(emptyEl);
+  
+  try {
+    const response = await fetch(API_BASE + '/api/pos');
+    const pos = await response.json();
+    
+    loadingEl.classList.remove('active');
+    
+    if (pos.length === 0) {
+      emptyEl.style.display = 'block';
+      return;
+    }
+    
+    pos.forEach(po => {
+      const card = document.createElement('div');
+      card.className = 'po-card';
+      card.innerHTML = '<div class="po-card-info"><h3>' + po.po_number + '</h3><p>' + po.customer_name + '</p></div>' +
+        '<div class="po-card-meta"><div class="amount">₹' + po.grand_total.toLocaleString('en-IN', { minimumFractionDigits: 2 }) + '</div><div class="date">' + po.po_date + '</div></div>';
+      card.addEventListener('click', async () => {
+        const detailRes = await fetch(API_BASE + '/api/pos/' + po.id);
+        const detail = await detailRes.json();
+        loadPO(detail);
+        listEl.classList.remove('active');
+      });
+      contentEl.appendChild(card);
+    });
+  } catch (error) {
+    loadingEl.classList.remove('active');
+    showToast('Error loading POs: ' + error.message, 'error');
+  }
+}
+
+document.getElementById('add-row-btn').addEventListener('click', addRow);
+document.getElementById('submit-btn').addEventListener('click', submitPO);
+document.getElementById('clear-btn').addEventListener('click', clearForm);
+
+document.getElementById('view-list-btn').addEventListener('click', loadPOList);
+document.getElementById('close-list-btn').addEventListener('click', () => {
+  document.getElementById('po-list').classList.remove('active');
+});
+
+document.getElementById('po-date').value = new Date().toISOString().split('T')[0];
+addRow();
+addRow();
+</script>
+</body>
+</html>
