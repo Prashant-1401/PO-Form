@@ -1,13 +1,5 @@
-directDeploy:
-  region: oregon
-  repo: https://github.com/Prashant-1401/PO-Form.git
-  builder:
-    name: python
-    version: "3.11"
-  buildCommand: npm install
-  startCommand: node server.js
-  envVars:
-    - key: NODE_ENV
-      value: production
-    - key: PORT
-      value: 10000
+services:
+  - name: po-form
+    buildCommand: npm install
+    startCommand: node server.js
+    rootDir: .
